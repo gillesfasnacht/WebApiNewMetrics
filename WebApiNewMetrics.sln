@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B85ACE3F-9A8D-4D10-B78D-52907C1C6AEA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiNewMetrics", "src\WebApiNewMetrics\WebApiNewMetrics.csproj", "{26DFA235-C52D-4F7B-93ED-C87912AB6402}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{BFA7BAC8-C44E-43B1-AED4-F91A2EF971CC}"
+	ProjectSection(SolutionItems) = preProject
+		configs\ASP.NET-Core-Endpoint.json = configs\ASP.NET-Core-Endpoint.json
+		configs\ASP.NET-Core-Logs.json = configs\ASP.NET-Core-Logs.json
+		configs\ASP.NET-Core.json = configs\ASP.NET-Core.json
+		configs\dashboard.yml = configs\dashboard.yml
+		configs\datasource.yml = configs\datasource.yml
+		configs\grafana.ini = configs\grafana.ini
+		configs\loki-config.yml = configs\loki-config.yml
+		configs\otel-collector-config.yml = configs\otel-collector-config.yml
+		configs\prometheus.yml = configs\prometheus.yml
+		configs\tempo.yml = configs\tempo.yml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26DFA235-C52D-4F7B-93ED-C87912AB6402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26DFA235-C52D-4F7B-93ED-C87912AB6402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26DFA235-C52D-4F7B-93ED-C87912AB6402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26DFA235-C52D-4F7B-93ED-C87912AB6402}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{26DFA235-C52D-4F7B-93ED-C87912AB6402} = {B85ACE3F-9A8D-4D10-B78D-52907C1C6AEA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D4FB6737-4D18-4B7F-99BE-8C46D6B3B1C6}
+	EndGlobalSection
+EndGlobal

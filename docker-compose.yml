@@ -1,0 +1,108 @@
+version: '3.8'
+
+networks:
+  metrics-network:
+    name: metrics_network
+    driver: bridge
+
+services:
+
+  webapinewmetrics:
+    container_name: webapi
+    image: ${DOCKER_REGISTRY-}webapinewmetrics
+    build:
+      context: .
+      dockerfile: src/WebApiNewMetrics/Dockerfile
+    ports:
+      - 5000:80
+      - 5001:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=cyberboy
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    networks:
+      - metrics-network
+  
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.46.0
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./tmp/prometheus:/prometheus
+    depends_on:
+      - webapinewmetrics
+    ports:
+      - 9090:9090
+    networks:
+      - metrics-network
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana:10.0.3
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor
+    depends_on:
+      - prometheus
+      - otel-collector
+      - tempo
+    volumes:
+      - ./configs/grafana.ini:/etc/grafana/grafana.ini
+      - ./configs/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./configs/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./configs/ASP.NET-Core.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core.json
+      - ./configs/ASP.NET-Core-Endpoint.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core-Endpoint.json
+      - ./configs/ASP.NET-Core-Logs.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core-Logs.json
+      - ./tmp/grafana/:/var/lib/grafana/
+    ports:
+      - 3000:3000
+    networks:
+      - metrics-network
+
+  loki:
+    container_name: loki
+    image: grafana/loki:2.8.4
+    depends_on:
+      - webapinewmetrics
+    ports:
+      - 3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./tmp/loki:/loki/
+      - ./configs/loki-config.yml:/etc/loki/local-config.yaml:ro
+    networks:
+      - metrics-network
+
+  otel-collector:
+    container_name: otelcollector
+    image: otel/opentelemetry-collector-contrib:0.82.0
+    command: [ --config=/etc/otel-collector-config.yml ]
+    volumes:
+      - ./configs/otel-collector-config.yml:/etc/otel-collector-config.yml
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+    ports:
+#      - 8889:8889 # Prometheus exporter metrics
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+    networks:
+      - metrics-network
+  
+  tempo:
+    image: grafana/tempo:2.2.0
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yml" ]
+    volumes:
+      - ./configs/tempo.yml:/etc/tempo.yml
+      - ./tmp/tempo:/tmp/tempo
+#    ports:      
+#      - "3200:3200"   # tempo      
+    networks:
+      - metrics-network
