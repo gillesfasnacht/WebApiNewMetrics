@@ -23,6 +23,17 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:5000']
 
+  # node exporter hardware and OS metrics
+  - job_name: "node" 
+    static_configs: 
+    - targets: ['node-exporter:9100']
+
+  # Google Container Advisor for resource usage and performance characteristics of their running containers
+  - job_name: "cadvisor" 
+    scrape_interval: 5s 
+    static_configs: 
+    - targets: ['cadvisor:8080']
+
   # Grafana Tempo high-scale distributed tracing backend
   #- job_name: 'tempo'
   #  static_configs:

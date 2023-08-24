@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "configs", "configs", "{BFA7
 		configs\datasource.yml = configs\datasource.yml
 		configs\grafana.ini = configs\grafana.ini
 		configs\loki-config.yml = configs\loki-config.yml
+		configs\Node-Exporter-Full.json = configs\Node-Exporter-Full.json
 		configs\otel-collector-config.yml = configs\otel-collector-config.yml
 		configs\prometheus.yml = configs\prometheus.yml
 		configs\tempo.yml = configs\tempo.yml
