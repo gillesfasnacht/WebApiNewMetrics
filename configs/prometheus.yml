@@ -25,6 +25,7 @@ scrape_configs:
 
   # node exporter hardware and OS metrics
   - job_name: "node" 
+    scrape_interval: 5s
     static_configs: 
     - targets: ['node-exporter:9100']
 
