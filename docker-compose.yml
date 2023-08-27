@@ -9,7 +9,7 @@ volumes:
   grafana-data: {}
   prometheus-data: {}
   loki-data: {}
-  temp-data: {}
+  tempo-data: {}
   
 services:
 
@@ -139,7 +139,7 @@ services:
     devices:
       - /dev/kmsg:/dev/kmsg 
     ports:
-      - 8080:8080
+      - 8090:8080
     networks:
       - metrics-network
     depends_on:
