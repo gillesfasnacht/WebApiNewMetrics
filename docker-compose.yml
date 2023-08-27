@@ -5,6 +5,12 @@ networks:
     name: metrics_network
     driver: bridge
 
+volumes:
+  grafana-data: {}
+  prometheus-data: {}
+  loki-data: {}
+  temp-data: {}
+  
 services:
 
   webapinewmetrics:
@@ -31,7 +37,7 @@ services:
     image: prom/prometheus:v2.46.0
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-#      - ./tmp/prometheus:/prometheus
+      - prometheus-data:/prometheus
     depends_on:
       - webapinewmetrics
     ports:
@@ -53,7 +59,7 @@ services:
       - ./configs/ASP.NET-Core.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core.json
       - ./configs/ASP.NET-Core-Endpoint.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core-Endpoint.json
       - ./configs/ASP.NET-Core-Logs.json:/etc/grafana/provisioning/dashboards/ASP.NET-Core-Logs.json
-#      - ./tmp/grafana/:/var/lib/grafana/
+      - grafana-data:/var/lib/grafana/
     ports:
       - 3000:3000
     networks:
@@ -68,7 +74,7 @@ services:
       - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
-#      - ./tmp/loki:/loki/
+      - loki-data:/loki/
       - ./configs/loki-config.yml:/etc/loki/local-config.yaml:ro
     networks:
       - metrics-network
@@ -96,7 +102,7 @@ services:
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:
       - ./configs/tempo.yml:/etc/tempo.yml
-#      - ./tmp/tempo:/tmp/tempo
+      - tempo-data:/tmp/tempo
 #    ports:      
 #      - "3200:3200"   # tempo      
     networks:
