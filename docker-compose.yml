@@ -10,6 +10,7 @@ volumes:
   prometheus-data: {}
   loki-data: {}
   tempo-data: {}
+  redis-data: {}
   
 services:
 
@@ -38,20 +39,16 @@ services:
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
-    depends_on:
-      - webapinewmetrics
     ports:
       - 9090:9090
     networks:
       - metrics-network
+    depends_on:
+      - webapinewmetrics
 
   grafana:
     container_name: grafana
     image: grafana/grafana:10.0.4
-    depends_on:
-      - prometheus
-      - otel-collector
-      - tempo
     volumes:
       - ./configs/grafana.ini:/etc/grafana/grafana.ini
       - ./configs/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
@@ -64,12 +61,15 @@ services:
       - 3000:3000
     networks:
       - metrics-network
+    depends_on:
+      - prometheus
+      - otel-collector
+      - tempo
+      - cadvisor
 
   loki:
     container_name: loki
     image: grafana/loki:2.8.4
-    depends_on:
-      - webapinewmetrics
     ports:
       - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
@@ -78,6 +78,8 @@ services:
       - ./configs/loki-config.yml:/etc/loki/local-config.yaml:ro
     networks:
       - metrics-network
+    depends_on:
+      - webapinewmetrics
 
   otel-collector:
     container_name: otelcollector
@@ -85,16 +87,16 @@ services:
     command: [ --config=/etc/otel-collector-config.yml ]
     volumes:
       - ./configs/otel-collector-config.yml:/etc/otel-collector-config.yml
-    depends_on:
-      - prometheus
-      - loki
-      - tempo
     ports:
 #      - 8889:8889 # Prometheus exporter metrics
       - 4317:4317 # OTLP gRPC receiver
       - 4318:4318 # OTLP http receiver
     networks:
       - metrics-network
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
   
   tempo:
     image: grafana/tempo:2.2.0
@@ -136,8 +138,10 @@ services:
       - /sys:/sys:ro 
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+      - /mnt/windows_docker/:/rootfs/var/lib/docker:ro  # <-- new volume only for WSL (Docker Desktop)
     devices:
       - /dev/kmsg:/dev/kmsg 
+    privileged: true
     ports:
       - 8090:8080
     networks:
@@ -148,6 +152,8 @@ services:
   redis:
     image: redis:7.2.0
     container_name: redis
+    volumes:
+      - redis-data:/data
     ports:
       - 6379:6379
     networks:
