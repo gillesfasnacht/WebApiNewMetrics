@@ -138,7 +138,8 @@ services:
       - /sys:/sys:ro 
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-      - /mnt/windows_docker/:/rootfs/var/lib/docker:ro  # <-- new volume only for WSL (Docker Desktop)
+      # See https://github.com/vacp2p/wakurtosis/issues/58
+      - /home/fasnagil/windows_docker/:/rootfs/var/lib/docker:ro  # <-- new volume only for WSL (Docker Desktop) in my owner user account (fasnagil)
     devices:
       - /dev/kmsg:/dev/kmsg 
     privileged: true
