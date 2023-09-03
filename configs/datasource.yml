@@ -13,16 +13,19 @@ datasources:
     type: loki
     access: proxy
     uid: P8E80F9AEF21F6940
+    orgId: 1
     url: http://loki:3100
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: false
+    apiVersion: 1
     jsonData:
-    derivedFields:
-    - datasourceUid: tempo
-      matcherRegex: (?:trace_id)=(\w+)
-      name: TraceID
-      url: $${__value.raw}
-      # Use $$ (double-dollar sign) when your configuration needs a literal dollar sign.
-    readOnly: false
-    editable: true
+      derivedFields:
+      - datasourceUid: tempo
+        matcherRegex: "\u0022traceid\u0022:\u0022(\\w+)\u0022"
+        name: TraceId
+        url: $${__value.raw}
 
   - name: Tempo
     type: tempo

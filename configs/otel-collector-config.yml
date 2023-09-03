@@ -7,9 +7,9 @@ receivers:
 processors:
   resource:
     attributes:
-      - action: insert
-        key: loki.format
-        value: raw
+#      - action: insert
+#        key: loki.format
+#        value: raw
       - action: insert
         key: loki.resource.labels
         value: app, runtime
