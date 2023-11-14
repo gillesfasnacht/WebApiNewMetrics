@@ -15,7 +15,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.4.8"
+      "version": ""
     },
     {
       "type": "datasource",
@@ -64,7 +64,7 @@
       }
     ]
   },
-  "description": "ASP.NET Core metrics from OpenTelemetry NuGet",
+  "description": "ASP.NET Core metrics from OpenTelemetry",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 17706,
@@ -86,6 +86,7 @@
             "seriesBy": "max"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -100,6 +101,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
@@ -116,7 +118,18 @@
               "mode": "off"
             }
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 1,
+                  "text": "0 ms"
+                }
+              },
+              "type": "special"
+            }
+          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -278,6 +291,7 @@
             "seriesBy": "max"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -291,6 +305,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "smooth",
             "lineWidth": 1,
             "pointSize": 5,
@@ -307,7 +322,19 @@
               "mode": "off"
             }
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "match": "null+nan",
+                "result": {
+                  "index": 1,
+                  "text": "0%"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 1,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -397,7 +424,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", status_code=~\"4..|5..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\", http_response_status_code=~\"4..|5..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
           "legendFormat": "All",
           "range": true,
           "refId": "All"
@@ -408,7 +435,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", status_code=~\"4..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\", http_response_status_code=~\"4..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
           "hide": false,
           "legendFormat": "4XX",
           "range": true,
@@ -420,7 +447,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", status_code=~\"5..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
+          "expr": "sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\", http_response_status_code=~\"5..\"}[$__rate_interval]) or vector(0)) / sum(rate(http_server_request_duration_seconds_bucket{job=\"$job\", instance=\"$instance\"}[$__rate_interval]))",
           "hide": false,
           "legendFormat": "5XX",
           "range": true,
@@ -442,6 +469,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -455,6 +483,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -514,7 +543,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(kestrel_current_connections{job=\"$job\", instance=\"$instance\"})",
+          "expr": "sum(kestrel_active_connections{job=\"$job\", instance=\"$instance\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -535,6 +564,7 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "",
@@ -548,6 +578,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -607,7 +638,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum(http_server_current_requests{job=\"$job\", instance=\"$instance\"})",
+          "expr": "sum(http_server_active_requests{job=\"$job\", instance=\"$instance\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -628,6 +659,7 @@
             "mode": "fixed"
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -666,7 +698,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -697,6 +729,7 @@
             "mode": "fixed"
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -735,7 +768,7 @@
         "text": {},
         "textMode": "value"
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -744,7 +777,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", exception_name!=\"\"})",
+          "expr": "sum(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", error_type!=\"\"})",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -804,7 +837,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -812,7 +845,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (scheme) (\r\n    max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval])\r\n  )",
+          "expr": "sum by (url_scheme) (\r\n    max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval])\r\n  )",
           "legendFormat": "{{scheme}}",
           "range": true,
           "refId": "A"
@@ -871,7 +904,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -879,7 +912,7 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (protocol) (\r\n    max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval])\r\n  )",
+          "expr": "sum by (method_route) (\r\n    label_replace(max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\"}[$__rate_interval]), \"method_route\", \"http/$1\", \"network_protocol_version\", \"(.*)\")\r\n  )",
           "legendFormat": "{{protocol}}",
           "range": true,
           "refId": "A"
@@ -959,7 +992,7 @@
                   {
                     "targetBlank": false,
                     "title": "Test",
-                    "url": "/d/NagEsjE4z/asp-net-core-endpoint-details?var-route=${__data.fields.route}&var-method=${__data.fields.method}&${__url_time_range}"
+                    "url": "/d/NagEsjE4z/asp-net-core-endpoint-details?var-route=${__data.fields.http_route}&var-method=${__data.fields.http_request_method}&${__url_time_range}"
                   }
                 ]
               }
@@ -968,7 +1001,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "route"
+              "options": "http_route"
             },
             "properties": [
               {
@@ -980,7 +1013,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "method"
+              "options": "http_request_method"
             },
             "properties": [
               {
@@ -1000,6 +1033,7 @@
       "hideTimeOverride": false,
       "id": 51,
       "options": {
+        "cellHeight": "sm",
         "footer": {
           "countRows": false,
           "fields": "",
@@ -1016,7 +1050,7 @@
           }
         ]
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -1025,7 +1059,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "  topk(10,\r\n  sum by (route, method, method_route) (\r\n    label_join(max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route!=\"\"}[$__rate_interval]), \"method_route\", \" \", \"method\", \"route\")\r\n  ))",
+          "expr": "  topk(10,\r\n  sum by (http_route, http_request_method, method_route) (\r\n    label_join(max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", http_route!=\"\"}[$__rate_interval]), \"method_route\", \" \", \"http_request_method\", \"http_route\")\r\n  ))",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1132,7 +1166,7 @@
                 "value": [
                   {
                     "title": "",
-                    "url": "/d/NagEsjE4z/asp-net-core-endpoint-details?var-route=${__data.fields.route}&var-method=${__data.fields.method}&${__url_time_range}"
+                    "url": "/d/NagEsjE4z/asp-net-core-endpoint-details?var-route=${__data.fields.http_route}&var-method=${__data.fields.http_request_method}&${__url_time_range}"
                   }
                 ]
               }
@@ -1141,7 +1175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "route"
+              "options": "http_route"
             },
             "properties": [
               {
@@ -1153,7 +1187,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "method"
+              "options": "http_request_method"
             },
             "properties": [
               {
@@ -1173,6 +1207,7 @@
       "hideTimeOverride": false,
       "id": 54,
       "options": {
+        "cellHeight": "sm",
         "footer": {
           "countRows": false,
           "fields": "",
@@ -1189,7 +1224,7 @@
           }
         ]
       },
-      "pluginVersion": "9.4.8",
+      "pluginVersion": "",
       "targets": [
         {
           "datasource": {
@@ -1198,7 +1233,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "  topk(10,\r\n  sum by (route, method, method_route) (\r\n    label_join(max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", route!=\"\", exception_name!=\"\"}[$__rate_interval]), \"method_route\", \" \", \"method\", \"route\")\r\n  ))",
+          "expr": "  topk(10,\r\n  sum by (http_route, http_request_method, method_route) (\r\n    label_join(max_over_time(http_server_request_duration_seconds_count{job=\"$job\", instance=\"$instance\", http_route!=\"\", error_type!=\"\"}[$__rate_interval]), \"method_route\", \" \", \"http_request_method\", \"http_route\")\r\n  ))",
           "format": "table",
           "instant": true,
           "interval": "",
@@ -1238,7 +1273,6 @@
   "refresh": "",
   "revision": 1,
   "schemaVersion": 38,
-  "style": "dark",
   "tags": [
     "dotnet",
     "prometheus",
@@ -1252,7 +1286,7 @@
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "label_values(http_server_current_requests, job)",
+        "definition": "label_values(http_server_active_requests,job)",
         "hide": 0,
         "includeAll": false,
         "label": "Job",
@@ -1260,8 +1294,8 @@
         "name": "job",
         "options": [],
         "query": {
-          "query": "label_values(http_server_current_requests, job)",
-          "refId": "StandardVariableQuery"
+          "query": "label_values(http_server_active_requests,job)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
         "regex": "",
@@ -1275,7 +1309,7 @@
           "type": "prometheus",
           "uid": "PBFA97CFB590B2093"
         },
-        "definition": "label_values(http_server_current_requests{job=~\"$job\"}, instance)",
+        "definition": "label_values(http_server_active_requests{job=~\"$job\"},instance)",
         "hide": 0,
         "includeAll": false,
         "label": "Instance",
@@ -1283,8 +1317,8 @@
         "name": "instance",
         "options": [],
         "query": {
-          "query": "label_values(http_server_current_requests{job=~\"$job\"}, instance)",
-          "refId": "StandardVariableQuery"
+          "query": "label_values(http_server_active_requests{job=~\"$job\"},instance)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
         "regex": "",
@@ -1295,13 +1329,27 @@
     ]
   },
   "time": {
-    "from": "now-30m",
+    "from": "now-5m",
     "to": "now"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "1s",
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
   "timezone": "",
   "title": "ASP.NET Core",
   "uid": "KdDACDp4z",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }
