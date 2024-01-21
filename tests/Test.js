@@ -8,15 +8,16 @@ export const options = {
 
 const BASE_URL = 'http://localhost:5000';
 let cities = [
-    "London", "Milan", "Rome", "Athens", "Zurich", "Manchester"
+    "Paris", "Lyon", "Marseille", "Bordeaux", "Toulouse"
 ]
 
 export default () => {
-    http.get(`${BASE_URL}/WeatherForecast/weather/${getRandomItem(cities)}?days=${Math.floor(Math.random())}`);
+    http.get(`${BASE_URL}/WeatherForecast/weather/${randomCity(cities)}?days=${Math.floor(Math.random() * 10) + 1}`);
     sleep(1);
 }
 
-function getRandomItem(arr) {
-    const randomIndex = Math.floor(Math.floor() * arr.length);
-    return arr[randomIndex];
+function randomCity(cities) {
+    let random_index = Math.floor(Math.random() * cities.length);
+    let random_city = cities[random_index];
+    return random_city;
 }
