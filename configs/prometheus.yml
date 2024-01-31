@@ -18,10 +18,10 @@ scrape_configs:
       - targets: ['prometheus:9090']
 
   # dotnet WebApi application
-  - job_name: 'webapinewmetrics'
-    scrape_interval: 5s
-    static_configs:
-      - targets: ['host.docker.internal:5000']
+  #- job_name: 'webapinewmetrics'
+  #  scrape_interval: 5s
+  #  static_configs:
+  #    - targets: ['host.docker.internal:5000']
 
   # node exporter hardware and OS metrics
   - job_name: "node" 
@@ -41,6 +41,8 @@ scrape_configs:
   #    - targets: ['tempo:3200']
   
   # OpenTelemetry Collector
-  #- job_name: 'otelcollector'
-  #  static_configs:
-  #    - targets: ['otelcollector:8889']
+  - job_name: 'otel-collector'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['otel-collector:8889']
+      - targets: ['otel-collector:8888']
