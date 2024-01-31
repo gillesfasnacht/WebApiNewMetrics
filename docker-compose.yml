@@ -35,7 +35,7 @@ services:
   
   prometheus:
     container_name: prometheus
-    image: prom/prometheus:v2.46.0
+    image: prom/prometheus:v2.49.1
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -48,7 +48,7 @@ services:
 
   grafana:
     container_name: grafana
-    image: grafana/grafana:10.0.4
+    image: grafana/grafana:10.0.10
     volumes:
       - ./configs/grafana.ini:/etc/grafana/grafana.ini
       - ./configs/datasource.yml:/etc/grafana/provisioning/datasources/datasource.yaml
@@ -69,7 +69,7 @@ services:
 
   loki:
     container_name: loki
-    image: grafana/loki:2.8.4
+    image: grafana/loki:2.8.7
     ports:
       - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
@@ -83,12 +83,12 @@ services:
 
   otel-collector:
     container_name: otelcollector
-    image: otel/opentelemetry-collector-contrib:0.82.0
+    image: otel/opentelemetry-collector-contrib:0.89.0
     command: [ --config=/etc/otel-collector-config.yml ]
     volumes:
       - ./configs/otel-collector-config.yml:/etc/otel-collector-config.yml
     ports:
-#      - 8889:8889 # Prometheus exporter metrics
+      - 8889:8889 # Prometheus exporter metrics
       - 4317:4317 # OTLP gRPC receiver
       - 4318:4318 # OTLP http receiver
     networks:
@@ -99,7 +99,7 @@ services:
       - tempo
   
   tempo:
-    image: grafana/tempo:2.2.0
+    image: grafana/tempo:2.3.1
     container_name: tempo
     command: [ "-config.file=/etc/tempo.yml" ]
     volumes:

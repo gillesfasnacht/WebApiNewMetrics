@@ -4,81 +4,73 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.OpenTelemetry;
 using WebApiNewMetrics;
 
 internal class Program
 {
-    public static ConfigurationManager Configuration { get; private set; }
+    public static ConfigurationManager? Configuration { get; private set; }
 
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        const string outputTemplate =
-            "[{Level:w}]: {Timestamp:dd-MM-yyyy:HH:mm:ss} {MachineName} {EnvironmentName} {SourceContext} {Message}{NewLine}{Exception}";
-
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithEnvironmentName()
             .Enrich.WithMachineName()
-            .WriteTo.Console(outputTemplate: outputTemplate)
+            .WriteTo.Console()
             .WriteTo.OpenTelemetry(options =>
             {
-                options.Endpoint = "http://host.docker.internal:4317";
+                options.Endpoint = builder.Configuration["Otlp:Endpoint"] ?? throw new InvalidOperationException();
                 options.Protocol = OtlpProtocol.Grpc;
                 options.ResourceAttributes = new Dictionary<string, object>
                 {
-                    ["app"] = "webapi",
-                    ["runtime"] = "dotnet",
-                    ["service.name"] = "WebApiNewMetrics"
+                    ["app"] = builder.Configuration["Otlp:App"] ?? throw new InvalidOperationException(),
+                    ["runtime"] = builder.Configuration["Otlp:Runtime"] ?? throw new InvalidOperationException(),
+                    ["service.name"] = builder.Configuration["Otlp:ServiceName"] ?? throw new InvalidOperationException()
                 };
             })
             .CreateLogger();
 
         builder.Host.UseSerilog();
 
-        Action<ResourceBuilder> appResourceBuilder =
-                resource => resource
-                    .AddTelemetrySdk()
-                    .AddService("WebApiNewMetrics");
-
         builder.Services.AddOpenTelemetry()
-            .ConfigureResource(appResourceBuilder)
-            .WithMetrics(builder =>
+            .WithMetrics(metricsProviderBuilder =>
             {
-                builder.AddPrometheusExporter();
-
-                builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
-                builder.AddView("request-duration",
-                    new ExplicitBucketHistogramConfiguration
+                metricsProviderBuilder.AddAspNetCoreInstrumentation()
+                    .AddRuntimeInstrumentation()
+                    .AddOtlpExporter(options =>
                     {
-                        Boundaries = new double[] { 0, 0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10 }
+                        options.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"] ?? throw new InvalidOperationException());
+                        options.Protocol = OtlpExportProtocol.Grpc;
                     });
             })
             .WithTracing(tracerProviderBuilder =>
-                tracerProviderBuilder
-                    .AddSource(Instrumentor.ServiceName)
-                    .ConfigureResource(resource => resource
-                        .AddService(Instrumentor.ServiceName))
-                    .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddHttpClientInstrumentation(options =>
-                    {
-                        options.FilterHttpRequestMessage = req =>
-                        {
-                            var ignore = new[] { "/loki/api" };
-                            return !ignore.Any(s => req.RequestUri!.ToString().Contains(s));
-                        };
-                    })
-                    .AddOtlpExporter(options =>
-                    {
-                        options.Endpoint = new Uri("http://host.docker.internal:4317");
-                        options.Protocol = OtlpExportProtocol.Grpc;
-                    }));
-
+            {
+                tracerProviderBuilder.AddSource(Instrumentor.ServiceName)
+                    .ConfigureResource(resource =>
+                        resource.AddService(Instrumentor.ServiceName))
+                            .AddAspNetCoreInstrumentation()
+                            .AddHttpClientInstrumentation(options =>
+                            {
+                                options.FilterHttpRequestMessage = req =>
+                                {
+                                    var ignore = new[] { "/loki/api" };
+                                    return !ignore.Any(s => req.RequestUri!.ToString().Contains(s));
+                                };
+                            })
+                            .AddOtlpExporter(options =>
+                            {
+                                options.Endpoint = new Uri(builder.Configuration["Otlp:Endpoint"] ?? throw new InvalidOperationException());
+                                options.Protocol = OtlpExportProtocol.Grpc;
+                            });
+            });
+                
         // Add services to the container.
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -88,8 +80,6 @@ internal class Program
         builder.Services.AddMetrics();
 
         var app = builder.Build();
-
-        app.MapPrometheusScrapingEndpoint();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
